@@ -1,0 +1,409 @@
+<template>
+
+  <div>
+
+    <h1 class="title">Farm Manager</h1>
+
+    <div class="animal-section">
+
+      <h2>Animal List</h2>
+
+      <div v-for="(animal, index) in animals" :key="index" class="animal-item">
+
+        <div class="animal-info">
+
+          <span class="animal-type">{{ animal.type }}</span>
+
+          <span class="animal-count">{{ animal.count }}</span>
+
+          <span class="sick-count">Sick: {{ animal.sickCount }}</span>
+
+          <span class="injected-date" v-if="animal.lastInjection">Last Injection: {{ animal.lastInjection }}</span>
+
+          <span class="injected-date" v-if="animal.nextInjection">Next Injection: {{ animal.nextInjection }}</span>
+
+        </div>
+
+        <div class="animal-actions">
+
+  <button @click="addAnimal(index)" class="action-button">Add</button>
+
+  <button @click="removeAnimal(index)" class="action-button">Remove</button>
+
+  <button @click="addSickAnimal(index)" class="action-button">Add Sick</button>
+
+  <button @click="removeSickAnimal(index)" class="action-button">Remove Sick</button>
+
+  <button @click="editInjection(index)" class="action-button">Edit Injection Date</button>
+
+</div>
+
+        <div class="injection-dates" v-if="editingIndex === index">
+
+          <span>Last Injection Date:</span>
+
+          <input v-model="animal.lastInjection" type="date" class="date-input" />
+
+          <span>Next Injection Date:</span>
+
+          <input v-model="animal.nextInjection" type="date" class="date-input" />
+
+          <button @click="saveInjection(index)" class="action-button">Save</button>
+
+          <button @click="cancelEdit" class="action-button">Cancel</button>
+
+        </div>
+
+       
+
+      </div>
+
+    </div>
+
+    <div class="food-section">
+
+      <h2>Food Monitoring</h2>
+
+      <div class="food-item">
+
+        <span class="food-label">Grass:</span>
+
+        <input v-model="food.grass" type="number" class="food-input" />
+
+      </div>
+
+      <div class="food-item">
+
+        <span class="food-label">Lecernce:</span>
+
+        <input v-model="food.lecernce" type="number" step="0.5" class="food-input" />
+
+      </div>
+
+      <div class="food-item">
+
+        <span class="food-label">Pig Grower:</span>
+
+        <input v-model="food.pigGrower" type="number" step="0.5" class="food-input" />
+
+      </div>
+
+      <div class="food-item">
+
+        <span class="food-label">Enerfeed:</span>
+
+        <input v-model="food.enerfeed" type="number" step="0.5" class="food-input" />
+
+      </div>
+
+      <div class="food-item">
+
+        <span class="food-label">Boar and Sow:</span>
+
+        <input v-model="food.boarSow" type="number" step="0.5" class="food-input" />
+
+      </div>
+
+    </div>
+
+  </div>
+
+</template>
+
+ 
+
+<style>
+
+/* Farm-themed CSS styles */
+
+ 
+
+.title {
+
+  font-size: 24px;
+
+  text-align: center;
+
+  margin-bottom: 20px;
+
+  color: #4CAF50; /* Green */
+
+}
+
+ 
+
+.animal-section, .food-section {
+
+  border: 1px solid #ccc;
+
+  padding: 20px;
+
+  margin-bottom: 20px;
+
+  background-color: #FFF8E1; /* Light Yellow */
+
+  border-radius: 5px;
+
+}
+
+ 
+
+.animal-item {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 10px 0;
+
+  border-bottom: 1px solid #ccc;
+
+}
+
+ 
+
+.animal-info {
+
+  display: flex;
+
+  align-items: center;
+
+}
+
+ 
+
+.animal-type {
+
+  font-weight: bold;
+
+  margin-right: 10px;
+
+  color: #FF5722; /* Deep Orange */
+
+}
+
+ 
+
+.animal-count {
+
+  font-size: 18px;
+
+  background-color: #4CAF50; /* Green */
+
+  color: #fff;
+
+  padding: 5px 10px;
+
+  border-radius: 5px;
+
+}
+
+ 
+
+.animal-actions {
+
+  display: flex;
+
+}
+
+ 
+
+.action-button {
+
+  background-color: #4CAF50; /* Green */
+
+  color: #fff;
+
+  border: none;
+
+  border-radius: 5px;
+
+  padding: 5px 10px;
+
+  margin-left: 5px;
+
+  cursor: pointer;
+
+}
+
+ 
+
+.injection-dates {
+
+  margin-top: 10px;
+
+  display: flex;
+
+  align-items: center;
+
+}
+
+ 
+
+.date-input {
+
+  margin-right: 10px;
+
+}
+
+ 
+
+.food-item {
+
+  display: flex;
+
+  align-items: center;
+
+  margin-top: 10px;
+
+}
+
+ 
+
+.food-label {
+
+  font-weight: bold;
+
+  margin-right: 10px;
+
+  flex-basis: 100px;
+
+  color: #4CAF50; /* Green */
+
+}
+
+ 
+
+.food-input {
+
+  flex: 1;
+
+  padding: 5px;
+
+  border: 1px solid #ccc;
+
+  border-radius: 5px;
+
+}
+
+.injected-date {
+
+  font-size: 14px;
+
+  color: #777; /* Gray */
+
+  margin-left: 10px;
+
+}
+
+</style>
+
+ 
+
+<script>
+
+export default {
+
+ data() {
+
+  return {
+
+    animals: [
+
+      { type: 'Sheep', count: 0, lastInjection: '', nextInjection: '', sickCount: 0 },
+
+      { type: 'Goat', count: 0, lastInjection: '', nextInjection: '', sickCount: 0 },
+
+      { type: 'Pig', count: 0, lastInjection: '', nextInjection: '', sickCount: 0 },
+
+      { type: 'Chicken', count: 0, lastInjection: '', nextInjection: '', sickCount: 0 },
+
+    ],
+
+      food: {
+
+        grass: 0,
+
+        lecernce: 0.0,
+
+        pigGrower: 0.0,
+
+        enerfeed: 0.0,
+
+        boarSow: 0.0, // Boar and Sow in the food section
+
+      },
+
+      editingIndex: -1,
+
+    };
+
+  },
+
+ 
+
+  methods: {
+
+    addAnimal(index) {
+
+      this.animals[index].count++;
+
+    },
+
+    removeAnimal(index) {
+
+      if (this.animals[index].count > 0) {
+
+        this.animals[index].count--;
+
+      }
+
+    },
+
+    addSickAnimal(index) {
+
+    this.animals[index].sickCount++;
+
+  },
+
+  removeSickAnimal(index) {
+
+    if (this.animals[index].sickCount > 0) {
+
+      this.animals[index].sickCount--;
+
+    }
+
+  },
+
+    editInjection(index) {
+
+      this.editingIndex = index;
+
+    },
+
+    saveInjection(index) {
+
+      // Save the edited injection dates and exit editing mode
+
+      this.editingIndex = -1;
+
+    },
+
+    cancelEdit() {
+
+      // Cancel editing and exit editing mode
+
+      this.editingIndex = -1;
+
+     
+
+    },
+
+  },
+
+};
+
+</script>
